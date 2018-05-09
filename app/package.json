@@ -1,0 +1,23 @@
+{
+  "name": "nginx-certbot-manager",
+  "version": "0.0.1",
+  "description": "A simple manager for nginx and certbot",
+  "main": "app.js",
+  "author": "Éverton Arruda <root@earruda.eti.br>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "postinstall": "ln -nsf .. node_modules/app"
+  },
+  "dependencies": {
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "pug": "^2.0.0-rc.4",
+    "shelljs": "^0.7.8"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.5"
+  }
+}

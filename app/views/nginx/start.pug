@@ -1,0 +1,16 @@
+extends ../base.pug
+
+block content
+  h1 nginx > Start
+
+  div.sites
+    if error
+      h2 An error has occurred
+      div
+        | #{error}
+    else
+      h2 nginx service started
+      div
+        strong output:
+        pre
+          #{output}

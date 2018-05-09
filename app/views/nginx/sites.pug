@@ -1,0 +1,17 @@
+extends ../base.pug
+
+block content
+  h1 nginx > Sites
+
+  div.sites
+    if error
+      h2 An error has occurred
+      div
+        | #{error}
+    else
+      ul
+        each file in sites
+          li #{file.name} [ enabled: #{file.isEnabled} ]
+        else
+          li No site configurations
+

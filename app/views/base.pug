@@ -1,0 +1,22 @@
+html(lang="en")
+  block variables
+    - var title='nginx+certbot manager'
+
+  head
+    meta(charset="utf-8")
+    title nginx+certbot manager
+    block head
+
+  body
+    block header
+      div
+        | nginx > #[a(href="/nginx/sites") Sites] | #[a(href="/nginx/reload") Reload]
+        | | #[a(href="/nginx/start") Start] | #[a(href="/nginx/stop") Stop]
+
+      div
+        | nginx status: #{nginxStatus}
+
+    block content
+      No content
+
+    block footer
