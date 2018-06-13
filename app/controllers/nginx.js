@@ -63,7 +63,7 @@ async function getSites(req, res) {
  */
 async function getStatus(req, res) {
   try {
-    const result = await nginxManager.getStatus();
+    const result = await nginxManager.status();
 
     return res
       .send({

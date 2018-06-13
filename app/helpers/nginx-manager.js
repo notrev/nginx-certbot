@@ -25,7 +25,7 @@ module.exports = nginxManager;
 \**********************/
 
 /**
- * Reload nginx
+ * Get nginx status
  */
 async function status() {
   try {

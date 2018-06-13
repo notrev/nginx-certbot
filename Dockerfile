@@ -5,6 +5,7 @@ RUN apt-get update -y && apt-get install nginx -y
 
 EXPOSE 80
 EXPOSE 443
+EXPOSE 3000
 
 ADD app /opt/app
 WORKDIR /opt/app
