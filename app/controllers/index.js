@@ -1,8 +1,8 @@
 const express = require('express');
 
-const homeViewController = require('app/controllers/home.view.js');
-const nginxViewController = require('app/controllers/nginx.view.js');
-const nginxController = require('app/controllers/nginx.js');
+const homeViewController = require('app/controllers/home.view');
+const nginxViewController = require('app/controllers/nginx.view');
+const nginxController = require('app/controllers/nginx');
 
 const router = express.Router();
 
