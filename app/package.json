@@ -12,6 +12,7 @@
     "postinstall": "ln -nsf .. node_modules/app"
   },
   "dependencies": {
+    "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "express": "^4.16.2",
     "pug": "^2.0.0-rc.4",

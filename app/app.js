@@ -5,6 +5,7 @@
 // External libs
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 
 // Internal libs
 const controllers = require('app/controllers');
@@ -22,6 +23,7 @@ const app = express();
 app.set('view engine', 'pug');
 
 app.use(cors());
+app.use(bodyParser.json());
 app.use(express.static('static'));
 app.use(controllers);
 
