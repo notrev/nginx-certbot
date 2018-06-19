@@ -6,6 +6,7 @@
 const express = require('express');
 
 // Internal libs
+const nginxSitesController = require('app/controllers/nginx-sites');
 const nginxManager = require('app/helpers/nginx-manager');
 
 /**********************\
@@ -18,7 +19,8 @@ const router = express.Router();
   Route definitions
 \**********************/
 
-router.get('/sites', getSites);
+router.use('/sites', nginxSitesController);
+
 router.get('/status', getStatus);
 router.post('/reload', postReload);
 router.post('/start', postStart);
@@ -30,33 +32,6 @@ module.exports = router;
 /**********************\
   Function definitions
 \**********************/
-
-/**
- * Get server block files from nginx
- */
-async function getSites(req, res) {
-  try {
-    const result = await nginxManager.getSites();
-
-    if (result.error) {
-      throw result.error;
-    }
-
-    return res
-      .send({
-        data: {
-          sites: result.data,
-        },
-      });
-  } catch (error) {
-    return res
-      .status(500)
-      .send({
-        error: true,
-        message: error.message,
-      });
-  }
-}
 
 /**
  * Get nginx service status

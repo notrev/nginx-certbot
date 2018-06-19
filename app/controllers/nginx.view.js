@@ -7,7 +7,7 @@ const express = require('express');
 
 // Internal libs
 const nginxManager = require('app/helpers/nginx-manager');
-const sitesManager = require('app/helpers/sites-manager');
+const nginxSitesManager = require('app/helpers/nginx-sites-manager');
 
 /**********************\
   Variables/Constants
@@ -36,11 +36,11 @@ module.exports = router;
  */
 async function sitesView(req, res) {
   try {
-    const sitesResult = await sitesManager.getSites();
+    const sitesResult = await nginxSitesManager.getSites();
     const nginxStatus = await nginxManager.status();
 
     if (sitesResult.error) {
-      throw siresResult.error;
+      throw sitesResult.error;
     }
 
     return res.render('nginx/sites', {
