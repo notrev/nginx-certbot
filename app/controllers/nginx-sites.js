@@ -20,6 +20,7 @@ const router = express.Router();
 
 router.get('/', getSites);
 router.post('/enable', enableSites);
+router.post('/disable', disableSites);
 
 // Route export
 module.exports = router;
@@ -67,6 +68,34 @@ async function enableSites(req, res) {
       .send({
         data: {
           sitesEnabled: result.data,
+        },
+      });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({
+        error: true,
+        message: error.message,
+      });
+  }
+}
+
+/**
+ * Disable nginx sites
+ */
+async function disableSites(req, res) {
+  try {
+    const sites = req.body.sites || [];
+    const result = await nginxSitesManager.disableSites(sites);
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    return res
+      .send({
+        data: {
+          sitesDisabled: result.data,
         },
       });
   } catch (error) {

@@ -17,6 +17,7 @@ const sitesEnabledPath = `${nginxBasePath}/sites-enabled`;
 // Module's public functions
 sitesManager.getSites = getSites;
 sitesManager.enableSites = enableSites;
+sitesManager.disableSites = disableSites;
 
 // Module export
 module.exports = sitesManager;
@@ -109,6 +110,36 @@ async function enableSites(sites = []) {
       error.message = `${regExpResult[1]}: ${regExpResult[2]}`;
     }
 
+    return {
+      error: error,
+    };
+  }
+}
+
+/**
+ * Remove symbolic link of files from /etc/nginx/sites-available to /etc/nginx/sites-enabled.
+ */
+async function disableSites(sites = []) {
+  try {
+    if (!sites) {
+      return {
+        data: [],
+      };
+    }
+
+    // removes symbolic link for each file
+    for (const i in sites) {
+      result = await shell.rm('-f', `${sitesEnabledPath}/${sites[i]}`);
+
+      if (result.code !== 0) {
+        throw new Error(result.stderr);
+      }
+    }
+
+    return {
+      data: sites,
+    };
+  } catch (error) {
     return {
       error: error,
     };
