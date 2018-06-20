@@ -19,6 +19,7 @@ const router = express.Router();
 \**********************/
 
 router.get('/', getSites);
+router.get('/:site/content', getSiteContent);
 router.post('/enable', enableSites);
 router.post('/disable', disableSites);
 
@@ -96,6 +97,38 @@ async function disableSites(req, res) {
       .send({
         data: {
           sitesDisabled: result.data,
+        },
+      });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({
+        error: true,
+        message: error.message,
+      });
+  }
+}
+
+/**
+ * Get the content of a specific site file
+ *
+ * Accepts param: raw, to return a raw response, without JSON. Doesn't need any value
+ */
+async function getSiteContent(req, res) {
+  try {
+    const file = req.params.site;
+    const result = await nginxSitesManager.getSiteContent(file);
+
+    // XXX: Should result.data be encoded in any way?
+    if (req.query.raw !== undefined) {
+      return res
+        .send(result.data);
+    }
+
+    return res
+      .send({
+        data: {
+          status: result.data,
         },
       });
   } catch (error) {

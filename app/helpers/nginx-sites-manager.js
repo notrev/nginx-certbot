@@ -5,6 +5,8 @@
 // External libs
 const shell = require('shelljs');
 
+const fileManager = require('app/helpers/file-manager');
+
 /**********************\
   Variables/Constants
 \**********************/
@@ -18,6 +20,7 @@ const sitesEnabledPath = `${nginxBasePath}/sites-enabled`;
 sitesManager.getSites = getSites;
 sitesManager.enableSites = enableSites;
 sitesManager.disableSites = disableSites;
+sitesManager.getSiteContent = getSiteContent;
 
 // Module export
 module.exports = sitesManager;
@@ -138,6 +141,27 @@ async function disableSites(sites = []) {
 
     return {
       data: sites,
+    };
+  } catch (error) {
+    return {
+      error: error,
+    };
+  }
+}
+
+/**
+ * Reads a specific file from sites-available directory and returns its content.
+ */
+async function getSiteContent(file) {
+  try {
+    const options = {
+      encoding: 'utf8',
+    };
+
+    const fileContent = await fileManager.readFile(`${sitesAvailablePath}/${file}`, options);
+
+    return {
+      data: fileContent,
     };
   } catch (error) {
     return {
