@@ -19,9 +19,10 @@ const router = express.Router();
 \**********************/
 
 router.get('/', getSites);
-router.get('/:site/content', getSiteContent);
 router.post('/enable', enableSites);
 router.post('/disable', disableSites);
+router.get('/:site/content', getSiteContent);
+router.post('/:site/content', postSiteContent);
 
 // Route export
 module.exports = router;
@@ -61,10 +62,6 @@ async function enableSites(req, res) {
     const sites = req.body.sites || [];
     const result = await nginxSitesManager.enableSites(sites);
 
-    if (result.error) {
-      throw result.error;
-    }
-
     return res
       .send({
         data: {
@@ -89,10 +86,6 @@ async function disableSites(req, res) {
     const sites = req.body.sites || [];
     const result = await nginxSitesManager.disableSites(sites);
 
-    if (result.error) {
-      throw result.error;
-    }
-
     return res
       .send({
         data: {
@@ -110,16 +103,16 @@ async function disableSites(req, res) {
 }
 
 /**
- * Get the content of a specific site file
+ * Get the content of the specified site file
  *
  * Accepts param: raw, to return a raw response, without JSON. Doesn't need any value
+ * If the file does not exist and raw query param is present, return empty response
  */
 async function getSiteContent(req, res) {
   try {
     const file = req.params.site;
     const result = await nginxSitesManager.getSiteContent(file);
 
-    // XXX: Should result.data be encoded in any way?
     if (req.query.raw !== undefined) {
       return res
         .send(result.data);
@@ -127,10 +120,36 @@ async function getSiteContent(req, res) {
 
     return res
       .send({
-        data: {
-          status: result.data,
-        },
+        data: result.data,
       });
+  } catch (error) {
+    let response;
+
+    if (req.query.raw === undefined) {
+      response = {
+        error: true,
+        message: error.message,
+      };
+    }
+
+    return res
+      .status(500)
+      .send(response);
+  }
+}
+
+/**
+ * Save the received content to a specified site file
+ */
+async function postSiteContent(req, res) {
+  try {
+    const file = req.params.site;
+    const content = req.body.content;
+
+    const result = await nginxSitesManager.updateSiteContent(file, content);
+
+    // XXX: Should it return anything? File name or content?
+    return res.send();
   } catch (error) {
     return res
       .status(500)

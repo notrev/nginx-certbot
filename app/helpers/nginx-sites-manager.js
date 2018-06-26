@@ -21,6 +21,7 @@ sitesManager.getSites = getSites;
 sitesManager.enableSites = enableSites;
 sitesManager.disableSites = disableSites;
 sitesManager.getSiteContent = getSiteContent;
+sitesManager.updateSiteContent = updateSiteContent;
 
 // Module export
 module.exports = sitesManager;
@@ -56,9 +57,7 @@ async function getSites() {
       data: files,
     };
   } catch (error) {
-    return {
-      error: error,
-    };
+    throw error;
   }
 }
 
@@ -106,16 +105,14 @@ async function enableSites(sites = []) {
       data: sites.map((site) => site.filename),
     };
   } catch (error) {
-    // TODO: implement a check for different errors
+    // TODO: implement checks for different errors
     const noFileRegExp = new RegExp('(no such file).*\/(.+)');
     const regExpResult = noFileRegExp.exec(error.message);
     if (regExpResult) {
       error.message = `${regExpResult[1]}: ${regExpResult[2]}`;
     }
 
-    return {
-      error: error,
-    };
+    throw error;
   }
 }
 
@@ -143,14 +140,15 @@ async function disableSites(sites = []) {
       data: sites,
     };
   } catch (error) {
-    return {
-      error: error,
-    };
+    throw error;
   }
 }
 
 /**
  * Reads a specific file from sites-available directory and returns its content.
+ * Accepts 'raw' query param
+ *
+ * If the file does not exist and 'raw' query param is set, return an empty response.
  */
 async function getSiteContent(file) {
   try {
@@ -158,14 +156,35 @@ async function getSiteContent(file) {
       encoding: 'utf8',
     };
 
-    const fileContent = await fileManager.readFile(`${sitesAvailablePath}/${file}`, options);
+    const result = await fileManager.readFile(`${sitesAvailablePath}/${file}`, options);
 
     return {
-      data: fileContent,
+      data: result,
     };
   } catch (error) {
-    return {
-      error: error,
+    // 'No file' error
+    if (error.code === 'ENOENT') {
+      error.message = `no such file: ${file}`;
+    }
+
+    throw error;
+  }
+}
+
+/**
+ * Saves received content to a file in sites-available directory.
+ */
+async function updateSiteContent(file, content) {
+  try {
+    const options = {
+      encoding: 'utf8',
     };
+
+    const fileContent = await fileManager.writeFile(
+        `${sitesAvailablePath}/${file}`, content, options);
+
+    return;
+  } catch (error) {
+    throw error;
   }
 }

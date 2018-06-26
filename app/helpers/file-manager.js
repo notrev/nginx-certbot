@@ -13,6 +13,7 @@ const fileManager = {};
 
 // Module's public functions
 fileManager.readFile = readFile;
+fileManager.writeFile = writeFile;
 
 // Module export
 module.exports = fileManager;
@@ -26,11 +27,27 @@ module.exports = fileManager;
  */
 function readFile(path, options={}) {
   return new Promise((resolve, reject) => {
-    try {
-      const fileContent = fs.readFileSync(path, options);
-      resolve(fileContent);
-    } catch (error) {
-      reject(error);
-    }
+    fs.readFile(path, options, (error, fileContent) => {
+      if (error) {
+        return reject(error);
+      }
+
+      return resolve(fileContent);
+    });
+  });
+}
+
+/**
+ * Write file
+ */
+function writeFile(path, data, options={}) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(path, data, options, (error) => {
+      if (error) {
+        return reject(error);
+      }
+
+      return resolve();
+    });
   });
 }
