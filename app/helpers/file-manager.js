@@ -16,6 +16,7 @@ fileManager.readFile = readFile;
 fileManager.writeFile = writeFile;
 fileManager.symbolicLink = symbolicLink;
 fileManager.unlink = unlink;
+fileManager.exists = exists;
 
 // Module export
 module.exports = fileManager;
@@ -95,6 +96,21 @@ function unlink(path, options={}) {
 
       // if file was removed, resolve with the path in the response
       return resolve(path);
+    });
+  });
+}
+
+/**
+ * Checks if file exists
+ */
+function exists(path) {
+  return new Promise((resolve, reject) => {
+    fs.access(path, fs.constants.F_OK, (error) => {
+      if (error) {
+        return reject(error);
+      }
+
+      return resolve();
     });
   });
 }

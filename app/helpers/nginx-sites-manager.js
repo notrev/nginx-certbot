@@ -84,9 +84,21 @@ async function enableSites(sites = []) {
         throw new Error('sites cannot contain `/`');
       }
 
+      // check if file exists. If it doesn't, remove it from the list
+      try {
+        await fileManager.exists(`${sitesAvailablePath}/${sites[i]}`);
+      } catch (error) {
+        sites[i] = null;
+      }
+    }
+
+    // filter out all null values
+    sites = sites.filter((item) => item !== null);
+
+    // create symbolic link for every existing file
+    for (const i in sites) {
       result = await fileManager.symbolicLink(
-          `${sitesAvailablePath}/${sites[i]}`, `${sitesEnabledPath}/${sites[i]}`, options);
-      console.log('##', sites[i], result);
+            `${sitesAvailablePath}/${sites[i]}`, `${sitesEnabledPath}/${sites[i]}`, options);
       enabledSites.push(result);
     }
 
@@ -129,7 +141,6 @@ async function disableSites(sites = []) {
         throw new Error('sites cannot contain `/`');
       }
       result = await fileManager.unlink(`${sitesEnabledPath}/${sites[i]}`);
-      console.log('##', sites[i], result);
       disabledSites.push(result);
     }
 
