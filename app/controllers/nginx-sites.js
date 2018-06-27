@@ -41,7 +41,7 @@ async function getSites(req, res) {
     return res
       .send({
         data: {
-          status: result.data,
+          sites: result.data,
         },
       });
   } catch (error) {
