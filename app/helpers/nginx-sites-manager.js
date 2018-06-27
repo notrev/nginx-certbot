@@ -79,6 +79,11 @@ async function enableSites(sites = []) {
     // create symbolic link for each file
     const options = { force: true };
     for (const i in sites) {
+      // check to prevent directory traversal
+      if (sites[i].indexOf('/') != -1) {
+        throw new Error('sites cannot contain `/`');
+      }
+
       result = await fileManager.symbolicLink(
           `${sitesAvailablePath}/${sites[i]}`, `${sitesEnabledPath}/${sites[i]}`, options);
       console.log('##', sites[i], result);
@@ -119,6 +124,10 @@ async function disableSites(sites = []) {
 
     // removes symbolic link for each file
     for (const i in sites) {
+      // check to prevent directory traversal
+      if (sites[i].indexOf('/') != -1) {
+        throw new Error('sites cannot contain `/`');
+      }
       result = await fileManager.unlink(`${sitesEnabledPath}/${sites[i]}`);
       console.log('##', sites[i], result);
       disabledSites.push(result);
