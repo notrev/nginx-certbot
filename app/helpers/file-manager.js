@@ -14,6 +14,8 @@ const fileManager = {};
 // Module's public functions
 fileManager.readFile = readFile;
 fileManager.writeFile = writeFile;
+fileManager.symbolicLink = symbolicLink;
+fileManager.unlink = unlink;
 
 // Module export
 module.exports = fileManager;
@@ -48,6 +50,51 @@ function writeFile(path, data, options={}) {
       }
 
       return resolve();
+    });
+  });
+}
+
+/**
+ * Create symbolic link of path into target
+ */
+function symbolicLink(path, target, options={}) {
+  return new Promise((resolve, reject) => {
+    fs.symlink(path, target, (error) => {
+      if (error) {
+        // if options.force is set, return error only if code is not 'EEXIST'
+        if (error.code !== 'EEXIST' || (error.code === 'EEXIST' && !options.force)) {
+          return reject(error);
+        }
+
+        // if file does not exist, resolve with empty response
+        return resolve();
+      }
+
+      // if symbolic link was created, resolve with the target as response
+      return resolve(target);
+    });
+  });
+}
+
+/**
+ * Remove file specified by path
+ */
+function unlink(path, options={}) {
+  return new Promise((resolve, reject) => {
+    fs.unlink(path, (error) => {
+      if (error) {
+        // If the error is "file does not exist", ignore it.
+        if (error.code !== 'ENOENT') {
+          console.log('!!!', error);
+          return reject(error);
+        }
+
+        // if file does not exist, resolve with empty response
+        return resolve();
+      }
+
+      // if file was removed, resolve with the path in the response
+      return resolve(path);
     });
   });
 }

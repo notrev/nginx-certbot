@@ -74,42 +74,29 @@ async function enableSites(sites = []) {
 
     let filename;
     let result;
-
-    // list the files to get only the existing ones
-    result = await shell.ls(sites.map((file) => `${sitesAvailablePath}/${file}`));
-
-    if (result.code !== 0) {
-      throw new Error(result.stderr);
-    }
-
-    // create a list of objects containing full path fo file and the filename
-    sites = [];
-    result.forEach((filePath) => {
-      filename = filePath.replace(`${sitesAvailablePath}/`, '');
-      sites.push({
-        filename: filename,
-        path: filePath,
-      });
-    });
+    let enabledSites = [];
 
     // create symbolic link for each file
+    const options = { force: true };
     for (const i in sites) {
-      result = await shell.ln('-sf', sites[i].path, `${sitesEnabledPath}/${sites[i].filename}`);
-
-      if (result.code !== 0) {
-        throw new Error(result.stderr);
-      }
+      result = await fileManager.symbolicLink(
+          `${sitesAvailablePath}/${sites[i]}`, `${sitesEnabledPath}/${sites[i]}`, options);
+      console.log('##', sites[i], result);
+      enabledSites.push(result);
     }
 
+    // remove the sites that were not successfuly enabled and remove the path from each of them,
+    // leaving only the filename
+    enabledSites = enabledSites.filter((item) => item !== undefined);
+    enabledSites = enabledSites.map((item) => item.replace(/^.*[\\\/]/, ''));
+
     return {
-      data: sites.map((site) => site.filename),
+      data: enabledSites,
     };
   } catch (error) {
-    // TODO: implement checks for different errors
-    const noFileRegExp = new RegExp('(no such file).*\/(.+)');
-    const regExpResult = noFileRegExp.exec(error.message);
-    if (regExpResult) {
-      error.message = `${regExpResult[1]}: ${regExpResult[2]}`;
+    if (error.code === 'EEXIST') {
+      const filename = error.path.replace(/^.*[\\\/]/, '');
+      error.message = `site already active: ${filename}`;
     }
 
     throw error;
@@ -127,17 +114,23 @@ async function disableSites(sites = []) {
       };
     }
 
+    let disabledSites = [];
+    let result;
+
     // removes symbolic link for each file
     for (const i in sites) {
-      result = await shell.rm('-f', `${sitesEnabledPath}/${sites[i]}`);
-
-      if (result.code !== 0) {
-        throw new Error(result.stderr);
-      }
+      result = await fileManager.unlink(`${sitesEnabledPath}/${sites[i]}`);
+      console.log('##', sites[i], result);
+      disabledSites.push(result);
     }
 
+    // remove the sites that were not successfuly disabled and remove the path from each of them,
+    // leaving only the filename
+    disabledSites = disabledSites.filter((item) => item !== undefined);
+    disabledSites = disabledSites.map((item) => item.replace(/^.*[\\\/]/, ''));
+
     return {
-      data: sites,
+      data: disabledSites,
     };
   } catch (error) {
     throw error;
