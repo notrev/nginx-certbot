@@ -120,7 +120,9 @@ async function getSiteContent(req, res) {
 
     return res
       .send({
-        data: result.data,
+        data: {
+          content: result.data,
+        },
       });
   } catch (error) {
     let response;
